@@ -95,6 +95,44 @@ const login = async (req, res) => {
         console.error('Erro ao fazer login:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
     }
+};
+
+const update = async (req, res) => {
+    try {
+        const { name, password } = req.body;
+
+        let profileImage = null;
+
+        if (req.file) {
+            profileImage = req.file.filename;
+        }
+
+        const reqUser = req.user;
+
+        const user = await User.findById(reqUser._id).select("-password");
+
+        if (name) {
+            user.name = name;
+        }
+
+        if (password) {
+            const salt = await bcrypt.genSalt();
+            const passwordHash = await bcrypt.hash(password, salt);
+
+            user.password = passwordHash;
+        }
+
+        if (profileImage) {
+            user.profileImage = profileImage;
+        }
+
+        await user.save();
+
+        return res.status(200).json(user);
+    } catch (error) {
+        console.error('Erro ao atualizar:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
 }
 
 const getCurrentUser = async (req, res) => {
@@ -119,12 +157,13 @@ const getUserById = async (req, res) => {
         res.status(404).json({ errors: ["Usuario não encontrado"] })
         return;
     }
-}
+};
 
 module.exports = {
     registerUser,
     registerAdminUser,
     login,
+    update,
     getCurrentUser,
     getUserById,
 }
