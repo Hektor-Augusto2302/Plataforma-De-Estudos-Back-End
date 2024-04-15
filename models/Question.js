@@ -14,7 +14,13 @@ const questionSchema = new mongoose.Schema({
         required: true,
         min: 0,
         max: 3
-    }
+    },
+    phase: {
+        type: String,
+        required: true
+    },
+    userId: mongoose.ObjectId,
+    userName: String,
 });
 
 const Question = mongoose.model('Question', questionSchema);
