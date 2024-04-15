@@ -29,15 +29,20 @@ const createQuestion = async (req, res) => {
     }
 };
 
+const getQuestionsByPhase = async (req, res) => {
+    try {
+        const phase = req.query.phase;
+        const questions = await Question.find({ phase: phase });
+        res.status(200).json({ questions });
+    } catch (error) {
+        console.error('Erro ao obter questões por fase:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+};
+
 const getQuestions = async (req, res) => {
     try {
-        const { phase } = req.query;
-
-        if (!phase) {
-            return res.status(400).json({ error: 'O parâmetro "phase" é obrigatório.' });
-        }
-
-        const questions = await Question.find({ phase });
+        const questions = await Question.find();
         res.status(200).json({ questions });
     } catch (error) {
         console.error('Erro ao obter questões:', error);
@@ -45,7 +50,49 @@ const getQuestions = async (req, res) => {
     }
 };
 
+const updateQuestion = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Apenas administradores podem atualizar questões' });
+        }
+
+        const questionId = req.params.id;
+        const { question, alternatives, correctAlternativeIndex, phase } = req.body;
+
+        const updatedQuestion = await Question.findByIdAndUpdate(
+            questionId,
+            { question, alternatives, correctAlternativeIndex, phase },
+            { new: true }
+        );
+
+        res.status(200).json(updatedQuestion);
+    } catch (error) {
+        console.error('Erro ao atualizar questão:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+};
+
+const deleteQuestion = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Apenas administradores podem excluir questões' });
+        }
+
+        const questionId = req.params.id;
+
+        await Question.findByIdAndDelete(questionId);
+
+        res.status(200).json({ message: 'Pergunta excluída com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir questão:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+};
+
 module.exports = {
     createQuestion,
     getQuestions,
+    getQuestionsByPhase,
+    updateQuestion,
+    deleteQuestion,
 }
