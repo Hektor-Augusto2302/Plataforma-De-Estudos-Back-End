@@ -98,6 +98,13 @@ const checkAnswer = async (req, res) => {
 
         const isCorrect = selectedAlternativeIndex === question.correctAlternativeIndex;
 
+        question.userAnswers.push({
+            selectedAlternativeIndex,
+            isCorrect
+        });
+        
+        await question.save();
+
         res.status(200).json({ isCorrect });
     } catch (error) {
         console.error('Erro ao verificar resposta:', error);

@@ -21,6 +21,16 @@ const questionSchema = new mongoose.Schema({
     },
     userId: mongoose.ObjectId,
     userName: String,
+    userAnswers: [
+        {
+            selectedAlternativeIndex: Number,
+            isCorrect: Boolean,
+            answeredAt: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
 });
 
 const Question = mongoose.model('Question', questionSchema);
