@@ -89,10 +89,27 @@ const deleteQuestion = async (req, res) => {
     }
 };
 
+const checkAnswer = async (req, res) => {
+    try {
+        const questionId = req.params.id;
+        const selectedAlternativeIndex = req.body.selectedAlternativeIndex;
+
+        const question = await Question.findById(questionId);
+
+        const isCorrect = selectedAlternativeIndex === question.correctAlternativeIndex;
+
+        res.status(200).json({ isCorrect });
+    } catch (error) {
+        console.error('Erro ao verificar resposta:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+};
+
 module.exports = {
     createQuestion,
     getQuestions,
     getQuestionsByPhase,
     updateQuestion,
     deleteQuestion,
+    checkAnswer,
 }
