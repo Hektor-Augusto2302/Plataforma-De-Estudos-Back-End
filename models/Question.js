@@ -21,6 +21,8 @@ const questionSchema = new mongoose.Schema({
     },
     userId: mongoose.ObjectId,
     userName: String,
+    likes: Array,
+    comments: Array,
     userAnswers: [
         {
             selectedAlternativeIndex: Number,

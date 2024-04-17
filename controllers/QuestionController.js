@@ -3,15 +3,15 @@ const User = require('../models/User');
 
 const createQuestion = async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
+        const reqUser = req.user;
+
+        const user = await User.findById(reqUser._id);
+
+        if (user !== 'admin') {
             return res.status(403).json({ error: 'Apenas administradores podem criar questões' });
         }
 
         const { question, alternatives, correctAlternativeIndex, phase } = req.body;
-
-        const reqUser = req.user;
-
-        const user = await User.findById(reqUser._id);
 
         const newQuestion = await Question.create({
             question,
@@ -52,7 +52,11 @@ const getQuestions = async (req, res) => {
 
 const updateQuestion = async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
+        const reqUser = req.user;
+
+        const user = await User.findById(reqUser._id);
+
+        if (user !== 'admin') {
             return res.status(403).json({ error: 'Apenas administradores podem atualizar questões' });
         }
 
@@ -74,7 +78,11 @@ const updateQuestion = async (req, res) => {
 
 const deleteQuestion = async (req, res) => {
     try {
-        if (req.user.role !== 'admin') {
+        const reqUser = req.user;
+
+        const user = await User.findById(reqUser._id);
+
+        if (user !== 'admin') {
             return res.status(403).json({ error: 'Apenas administradores podem excluir questões' });
         }
 
@@ -102,7 +110,7 @@ const checkAnswer = async (req, res) => {
             selectedAlternativeIndex,
             isCorrect
         });
-        
+
         await question.save();
 
         res.status(200).json({ isCorrect });
