@@ -7,8 +7,8 @@ const createQuestion = async (req, res) => {
 
         const user = await User.findById(reqUser._id);
 
-        if (user !== 'admin') {
-            return res.status(403).json({ error: 'Apenas administradores podem criar questões' });
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Apenas administradores podem excluir questões' });
         }
 
         const { question, alternatives, correctAlternativeIndex, phase } = req.body;
@@ -56,8 +56,8 @@ const updateQuestion = async (req, res) => {
 
         const user = await User.findById(reqUser._id);
 
-        if (user !== 'admin') {
-            return res.status(403).json({ error: 'Apenas administradores podem atualizar questões' });
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Apenas administradores podem excluir questões' });
         }
 
         const questionId = req.params.id;
@@ -82,7 +82,7 @@ const deleteQuestion = async (req, res) => {
 
         const user = await User.findById(reqUser._id);
 
-        if (user !== 'admin') {
+        if (req.user.role !== 'admin') {
             return res.status(403).json({ error: 'Apenas administradores podem excluir questões' });
         }
 
@@ -120,6 +120,40 @@ const checkAnswer = async (req, res) => {
     }
 };
 
+const likeQuestion = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const reqUser = req.user;
+
+        const question = await Question.findById(id);
+
+        if (!question) {
+            res.status(404).json({ errors: ["Foto não encontrada."] })
+            return
+        };
+
+        if (question.likes.includes(reqUser._id)) {
+            res.status(422).json({ erros: ["Você ja curtiu esta foto."] })
+            return
+        };
+
+        if(question.likes.includes(reqUser._id)) {
+            res.status(422).json({erros: ["Você ja curtiu esta foto."]})
+            return
+        };
+
+        question.likes.push(reqUser._id);
+
+        await question.save();
+
+        res.status(200).json({ questionId: id, userId: reqUser._id, userName: reqUser.name })
+    } catch (error) {
+        console.error('Erro ao verificar resposta:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+};
+
 module.exports = {
     createQuestion,
     getQuestions,
@@ -127,4 +161,5 @@ module.exports = {
     updateQuestion,
     deleteQuestion,
     checkAnswer,
+    likeQuestion,
 }
