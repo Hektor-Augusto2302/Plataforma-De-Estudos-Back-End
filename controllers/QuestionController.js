@@ -54,8 +54,6 @@ const updateQuestion = async (req, res) => {
     try {
         const reqUser = req.user;
 
-        const user = await User.findById(reqUser._id);
-
         if (req.user.role !== 'admin') {
             return res.status(403).json({ error: 'Apenas administradores podem excluir questões' });
         }
@@ -79,8 +77,6 @@ const updateQuestion = async (req, res) => {
 const deleteQuestion = async (req, res) => {
     try {
         const reqUser = req.user;
-
-        const user = await User.findById(reqUser._id);
 
         if (req.user.role !== 'admin') {
             return res.status(403).json({ error: 'Apenas administradores podem excluir questões' });
@@ -129,29 +125,66 @@ const likeQuestion = async (req, res) => {
         const question = await Question.findById(id);
 
         if (!question) {
-            res.status(404).json({ errors: ["Foto não encontrada."] })
+            res.status(404).json({ errors: ["Questão não encontrada."] })
             return
         };
 
         if (question.likes.includes(reqUser._id)) {
-            res.status(422).json({ erros: ["Você ja curtiu esta foto."] })
+            res.status(422).json({ erros: ["Você ja curtiu esta questão."] })
             return
         };
 
-        if(question.likes.includes(reqUser._id)) {
-            res.status(422).json({erros: ["Você ja curtiu esta foto."]})
-            return
+        const userLike = {
+            questionId: id,
+            userName: reqUser.name,
+            userId: reqUser._id,
         };
 
-        question.likes.push(reqUser._id);
+        question.likes.push(userLike);
 
         await question.save();
 
-        res.status(200).json({ questionId: id, userId: reqUser._id, userName: reqUser.name })
+        res.status(200).json({ like: userLike })
     } catch (error) {
         console.error('Erro ao verificar resposta:', error);
         res.status(500).json({ error: 'Erro interno do servidor' });
     }
+};
+
+const commentQuestion = async (req, res) => {
+
+    try {
+        const { id } = req.params;
+        const { comment } = req.body;
+
+        const reqUser = req.user;
+
+        const user = await User.findById(reqUser._id);
+
+        const question = await Question.findById(id);
+
+        if (!question) {
+            res.status(404).json({ errors: ["Questão não encontrada."] })
+            return
+        };
+
+        const userComment = {
+            comment,
+            userName: user.name,
+            userImage: user.profileImage,
+            userId: user._id
+        };
+
+        question.comments.push(userComment)
+
+        await question.save();
+
+        res.status(200).json({ comment: userComment, message: "O comentario foi adicionado com sucesso!" });
+    } catch (error) {
+        console.error('Erro ao verificar resposta:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+
 };
 
 module.exports = {
@@ -162,4 +195,5 @@ module.exports = {
     deleteQuestion,
     checkAnswer,
     likeQuestion,
+    commentQuestion,
 }

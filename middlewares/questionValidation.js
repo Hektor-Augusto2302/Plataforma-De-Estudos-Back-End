@@ -50,7 +50,16 @@ const updateQuestionValidation = () => {
     ];
 };
 
+const commentValidation = () => {
+    return [
+        body("comment")
+            .isString()
+            .withMessage("O comentario é obrigatorio."),
+    ]
+};
+
 module.exports = {
     questionCreateValidation,
     updateQuestionValidation,
+    commentValidation,
 };
