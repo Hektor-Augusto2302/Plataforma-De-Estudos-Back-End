@@ -4,7 +4,6 @@ const router = express.Router();
 const {
     createQuestion,
     getQuestions,
-    getQuestionsByPhase,
     updateQuestion,
     deleteQuestion,
     checkAnswer,
@@ -18,7 +17,6 @@ const validate = require("../middlewares/handleValidation");
 router.post("/create", authGuard, questionCreateValidation(), validate, createQuestion);
 router.post("/check/:id", authGuard, checkAnswer);
 router.get("/", authGuard, getQuestions)
-router.get("/byPhase", authGuard, getQuestionsByPhase);
 router.put("/update/:id", authGuard, updateQuestionValidation(), validate, updateQuestion);
 router.patch("/like/:id", authGuard, likeQuestion);
 router.patch("/comment/:id", authGuard, commentValidation(), validate, commentQuestion);

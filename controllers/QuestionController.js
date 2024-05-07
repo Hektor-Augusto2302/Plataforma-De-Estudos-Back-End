@@ -29,17 +29,6 @@ const createQuestion = async (req, res) => {
     }
 };
 
-const getQuestionsByPhase = async (req, res) => {
-    try {
-        const phase = req.query.phase;
-        const questions = await Question.find({ phase: phase });
-        res.status(200).json({ questions });
-    } catch (error) {
-        console.error('Erro ao obter questões por fase:', error);
-        res.status(500).json({ error: 'Erro interno do servidor' });
-    }
-};
-
 const getQuestions = async (req, res) => {
     try {
         const questions = await Question.find();
@@ -190,7 +179,6 @@ const commentQuestion = async (req, res) => {
 module.exports = {
     createQuestion,
     getQuestions,
-    getQuestionsByPhase,
     updateQuestion,
     deleteQuestion,
     checkAnswer,
