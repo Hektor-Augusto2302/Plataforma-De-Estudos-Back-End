@@ -92,6 +92,8 @@ const checkAnswer = async (req, res) => {
         const isCorrect = selectedAlternativeIndex === question.correctAlternativeIndex;
 
         question.userAnswers.push({
+            userId: req.user._id,
+            userName: req.user.name,
             selectedAlternativeIndex,
             isCorrect
         });

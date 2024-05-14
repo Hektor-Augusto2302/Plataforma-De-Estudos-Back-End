@@ -26,6 +26,12 @@ const questionSchema = new mongoose.Schema(
         comments: Array,
         userAnswers: [
             {
+                userId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                },
+                userName: {
+                    type: String,
+                },
                 selectedAlternativeIndex: Number,
                 isCorrect: Boolean,
                 answeredAt: {
